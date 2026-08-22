@@ -12,10 +12,17 @@ export default function Navbar() {
     <header className="w-full bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         
-        {/* Logo épuré */}
-        <div className="flex items-center gap-2">
-          <Link to="/" className="bg-industrial-blue text-white font-black text-lg sm:text-xl px-3.5 py-2 rounded-lg shadow-sm tracking-wider hover:opacity-95 transition">
-            OA MÉTAL
+        {/* Logo de l'entreprise (Uniquement l'image) */}
+        <div className="flex items-center">
+          <Link to="/" className="flex items-center group">
+            <img 
+              src="/logo.jpeg" 
+              alt="OA Métal Industrie" 
+              className="h-12 w-auto object-contain group-hover:opacity-95 transition"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
           </Link>
         </div>
 

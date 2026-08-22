@@ -11,9 +11,14 @@ export default function Footer() {
           
           {/* Colonne 1 : Logo & Infos */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Link to="/" className="bg-white text-industrial-blue font-black text-sm sm:text-base px-3 py-2 rounded hover:opacity-95 transition tracking-wider">
-                OA MÉTAL INDUSTRIE
+            <div className="flex items-center">
+              <Link to="/" className="inline-block bg-white px-3 py-2 rounded hover:opacity-95 transition">
+                <img 
+                  src="/logo.jpeg" 
+                  alt="OA Métal Industrie" 
+                  className="h-10 w-auto object-contain"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
               </Link>
             </div>
             <p className="text-xs text-gray-400 leading-relaxed">
@@ -35,7 +40,7 @@ export default function Footer() {
               <li><Link to="/produits" className="hover:text-industrial-orange transition">Produits</Link></li>
               <li><Link to="/services" className="hover:text-industrial-orange transition">Services</Link></li>
               <li><Link to="/realisations" className="hover:text-industrial-orange transition">Réalisations</Link></li>
-              <li><Link to="/actualites" className="hover:text-industrial-orange transition">Actualités</Link></li> {/* <--- Ajouté ici */}
+              <li><Link to="/actualites" className="hover:text-industrial-orange transition">Actualités</Link></li>
               <li><Link to="/contact" className="hover:text-industrial-orange transition">Contact</Link></li>
             </ul>
           </div>
