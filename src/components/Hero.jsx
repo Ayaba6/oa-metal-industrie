@@ -18,8 +18,8 @@ const heroSlides = [
     highlight: "AU SERVICE",
     title2: "DE VOS PROJETS !",
     slogan: "Qualité supérieure • Résistance maximale • Confiance durable",
-    // Image d'atelier / structure métallique lourde ou soudure
-    image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=2000&q=80",
+    // Remplacez le chemin ci-dessous par votre première image (ex: "/images/slide1.jpg")
+    image: "/images/fer-beton.jpg",
     badgeTitle: "Qualité Certifiée",
     badgeSub: "Satisfaction Garantie",
     badgeIcon: ShieldCheck
@@ -30,8 +30,8 @@ const heroSlides = [
     highlight: "DE CONSTRUCTION",
     title2: "HAUTE RÉSISTANCE",
     slogan: "Fers à béton • Tôles ondulées • Profilés métalliques robustes",
-    // Image de fers à béton / barres d'acier industrielles
-    image: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&w=2000&q=80",
+    // Remplacez le chemin ci-dessous par votre deuxième image (ex: "/images/slide2.jpg")
+    image: "/images/tole-ondulee.jpg",
     badgeTitle: "Normes & Sécurité",
     badgeSub: "Matériaux 100% Testés",
     badgeIcon: Building2
@@ -42,7 +42,8 @@ const heroSlides = [
     highlight: "SUR VOS CHANTIERS",
     title2: "PARTOUT AU BURKINA",
     slogan: "Réactivité • Logistique adaptée • Service client à l'écoute",
-    image: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=2000&q=80",
+    // Remplacez le chemin ci-dessous par votre troisième image (ex: "/images/slide3.jpg")
+    image: "/images/tube-carre.jpg",
     badgeTitle: "Service Pro",
     badgeSub: "Disponibilité Permanente",
     badgeIcon: Truck
