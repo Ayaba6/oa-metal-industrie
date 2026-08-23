@@ -1,69 +1,95 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ShieldCheck, Filter, Layers, CheckCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle } from 'lucide-react';
 
 const categories = [
   { id: 'all', label: 'Tous les produits' },
-  { id: 'fers', label: 'Fers à béton' },
   { id: 'toles', label: 'Tôles & Couvertures' },
-  { id: 'profiles', label: 'Profilés métalliques' },
+  { id: 'fers', label: 'Fers & Armatures' },
+  { id: 'profiles', label: 'Profilés & Tubes' },
   { id: 'accessoires', label: 'Accessoires & Fixations' },
 ];
 
 const productsList = [
   {
     id: 1,
-    title: "Fer à béton Haute Adhérence (HA)",
-    category: "fers",
-    description: "Fers de construction de haute résistance (Fe E500) disponibles du diamètre 8mm au 32mm. Conformes aux normes internationales de sécurité.",
-    image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=800&q=80",
-    specs: ["Diamètres : 8mm à 32mm", "Norme ISO & Certifié", "Haute résistance sismique"],
+    title: "Tôle Ondulée",
+    category: "toles",
+    description: "Robustes et durables pour tous types de couvertures résidentielles ou industrielles.",
+    // 👉 CHANGEZ LE NOM DE L'IMAGE ICI (placez votre fichier dans le dossier public/images/)
+    image: "/images/tole-ondulee.jpg",
+    specs: ["Robuste & durable", "Excellente résistance intempéries", "Pose facile"],
     badge: "Populaire"
   },
   {
     id: 2,
-    title: "Tôles Ondulées & Bac Aluminium",
+    title: "Tôle Bac",
     category: "toles",
-    description: "Tôles galvanisées et bacs alu robustes pour toitures industrielles et résidentielles. Excellente résistance à la corrosion.",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
-    specs: ["Épaisseurs variées", "Traitement anti-corrosion", "Pose facile"],
+    description: "Tôles bac de haute qualité offrant une esthétique moderne et une étanchéité irréprochable.",
+    // 👉 CHANGEZ LE NOM DE L'IMAGE ICI
+    image: "/images/tole-bac.jpg",
+    specs: ["Haute qualité", "Grande rigidité", "Idéal grands chantiers"],
     badge: "Résistant"
   },
   {
     id: 3,
-    title: "Profilés Métalliques (IPE, HEB, UPN)",
-    category: "profiles",
-    description: "Poutrelles et profilés en acier de premier choix pour charpentes métalliques, structures de bâtiments et ouvrages d'art.",
-    image: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80",
-    specs: ["Acier S275 / S355", "Longueurs standard 6m / 12m", "Coupe sur mesure possible"],
-    badge: "Industriel"
-  },
-  {
-    id: 4,
-    title: "Tubes Ronds & Rectangulaires",
-    category: "profiles",
-    description: "Tubes soudés en acier noir ou galvanisé pour la serrurerie, les portails, les échafaudages et les structures porteuses.",
-    image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=800&q=80",
-    specs: ["Diverses sections", "Finition propre", "Haute soudabilité"],
-    badge: "Polyvalent"
-  },
-  {
-    id: 5,
-    title: "Fils de ligature & Pointes",
-    category: "accessoires",
-    description: "Consommables essentiels pour chantiers : fils de fer recuit pour attache de fers à béton et pointes de toutes dimensions.",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
-    specs: ["Rouleaux haute flexibilité", "Conditionnement pro", "Résistance à la rupture"],
+    title: "Fer à Béton",
+    category: "fers",
+    description: "Solide et résistant pour renforcer durablement vos fondations et structures en béton armé.",
+    // 👉 CHANGEZ LE NOM DE L'IMAGE ICI
+    image: "/images/fer-beton.jpg",
+    specs: ["Solide & résistant", "Normes internationales", "Divers diamètres"],
     badge: "Essentiel"
   },
   {
-    id: 6,
-    title: "Grilles Soudées & Treillis SOUDÉ",
+    id: 4,
+    title: "Fer Attaché",
     category: "fers",
-    description: "Panneaux de treillis soudés pour le renforcement des dalles, dallages et fondations en béton armé.",
-    image: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80",
-    specs: ["Mailles standard", "Fils haute résistance", "Gain de temps sur chantier"],
-    badge: "Certifié"
+    description: "Solide et fiable pour lier efficacement vos structures de fers à béton sur les chantiers.",
+    // 👉 CHANGEZ LE NOM DE L'IMAGE ICI
+    image: "/images/ferattache.jpg",
+    specs: ["Solide & fiable", "Facile à manipuler", "Attache sécurisée"],
+    badge: "Chantier"
+  },
+  {
+    id: 5,
+    title: "IPN",
+    category: "profiles",
+    description: "Poutrelles métalliques garantissant une robustesse maximale pour vos charpentes et structures porteuses.",
+    // 👉 CHANGEZ LE NOM DE L'IMAGE ICI
+    image: "/images/ipn2.jpg",
+    specs: ["Robustesse garantie", "Acier de premier choix", "Longueurs adaptées"],
+    badge: "Industriel"
+  },
+  {
+    id: 6,
+    title: "Tube Carré",
+    category: "profiles",
+    description: "Allie solidité et esthétique pour vos travaux de serrurerie, portails et ossatures métalliques.",
+    // 👉 CHANGEZ LE NOM DE L'IMAGE ICI
+    image: "/images/tube-carre2.jpg",
+    specs: ["Solide & esthétique", "Finition propre", "Multi-usages"],
+    badge: "Polyvalent"
+  },
+  {
+    id: 7,
+    title: "Crochet",
+    category: "accessoires",
+    description: "Conçu pour une fixation sécurisée de vos couvertures et éléments de toiture.",
+    // 👉 CHANGEZ LE NOM DE L'IMAGE ICI
+    image: "/images/crochet.jpg",
+    specs: ["Fixation sécurisée", "Matériau anti-corrosion", "Tenue irréprochable"],
+    badge: "Accessoire"
+  },
+  {
+    id: 8,
+    title: "Pointe",
+    category: "accessoires",
+    description: "Pointes de qualité supérieure offrant précision et performance pour tous vos travaux de charpente.",
+    // 👉 CHANGEZ LE NOM DE L'IMAGE ICI
+    image: "/images/pointe.jpg",
+    specs: ["Précision & performance", "Diverses dimensions", "Forte pénétration"],
+    badge: "Accessoire"
   }
 ];
 
@@ -81,7 +107,7 @@ export default function Products() {
       <section className="relative bg-industrial-blue text-white py-20 overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <img 
-            src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=2000&q=80" 
+            src="/images/header-bg.jpg" // 👉 Vous pouvez aussi changer l'image d'en-tête ici si vous le souhaitez
             alt="Produits OA Métal" 
             className="w-full h-full object-cover"
           />
@@ -95,7 +121,7 @@ export default function Products() {
             transition={{ duration: 0.5 }}
             className="text-industrial-orange font-bold text-xs uppercase tracking-widest bg-industrial-orange/10 px-3 py-1 rounded-full inline-block"
           >
-            Catalogue Officiel
+            Qualité • Résistance • Confiance
           </motion.span>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
@@ -111,7 +137,7 @@ export default function Products() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto"
           >
-            Découvrez notre gamme complète de fers à béton, tôles et profilés métalliques de qualité supérieure pour tous vos chantiers de construction.
+            Découvrez la force du métal au service de vos projets avec notre catalogue complet de fers, tôles, profilés et accessoires.
           </motion.p>
         </div>
       </section>
@@ -208,16 +234,16 @@ export default function Products() {
       <section className="bg-gray-50 py-16 border-t border-gray-100">
         <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
           <h2 className="text-2xl sm:text-3xl font-black text-industrial-blue uppercase">
-            Vous avez un besoin spécifique ou une commande sur mesure ?
+            Besoin d'autres matériaux selon vos besoins spécifiques ?
           </h2>
           <p className="text-gray-600 text-xs sm:text-sm">
-            Notre équipe technique est à votre écoute pour étudier vos plans et vous fournir une cotation rapide adaptée à votre chantier.
+            Retrouvez-nous à Bassinko - Station OTAM à Ouagadougou ou contactez notre service client pour un accompagnement sur mesure.
           </p>
           <a 
             href="#contact" 
             className="inline-flex bg-industrial-orange hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-8 py-4 rounded-xl uppercase tracking-wider transition shadow-lg"
           >
-            Contactez notre service commercial
+            Contactez-nous au +226 70 71 76 87
           </a>
         </div>
       </section>

@@ -2,6 +2,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, Target, Eye, Award, Users, Building2, MapPin } from 'lucide-react';
 
+// Importez vos images depuis le dossier src/assets ici :
+import banniereImage from '../assets/ban.jpg';
+import equipeImage from '../assets/apropos.jpg';
+
 const fadeIn = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
@@ -21,13 +25,13 @@ export default function About() {
       
       {/* En-tête / Bannière de la page */}
       <section className="relative bg-industrial-blue text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 opacity-45">
           <img 
-            src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=2000&q=80" 
+            src={banniereImage} 
             alt="Usine OA Métal Industrie" 
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-industrial-blue via-industrial-blue/90 to-industrial-blue/60"></div>
+          <div className="absolute inset-0 bg-industrial-blue/60"></div>
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
@@ -35,7 +39,7 @@ export default function About() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="text-industrial-orange font-bold text-xs uppercase tracking-widest bg-industrial-orange/10 px-3 py-1 rounded-full inline-block"
+            className="text-industrial-orange font-bold text-xs uppercase tracking-widest bg-industrial-orange/20 px-3 py-1 rounded-full inline-block backdrop-blur-sm"
           >
             Qui sommes-nous ?
           </motion.span>
@@ -43,7 +47,7 @@ export default function About() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-5xl font-black uppercase tracking-tight"
+            className="text-4xl sm:text-5xl font-black uppercase tracking-tight drop-shadow-md"
           >
             À Propos d'OA Métal Industrie
           </motion.h1>
@@ -51,7 +55,7 @@ export default function About() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto"
+            className="text-gray-200 text-sm sm:text-base max-w-2xl mx-auto drop-shadow"
           >
             Leader dans la fourniture de matériaux métalliques de construction au Burkina Faso, alliant robustesse, qualité et service irréprochable.
           </motion.p>
@@ -72,7 +76,7 @@ export default function About() {
             >
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img 
-                  src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80" 
+                  src={equipeImage} 
                   alt="Équipe OA Métal" 
                   className="w-full h-96 object-cover"
                 />
@@ -132,38 +136,46 @@ export default function About() {
         </div>
       </section>
 
-      {/* Section Vision & Mission */}
+      {/* Section Vision & Mission avec effet au survol */}
       <section className="py-16 bg-gray-50 border-y border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
+            {/* Carte Mission */}
             <motion.div 
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
               variants={fadeIn}
-              className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 space-y-4"
+              whileHover={{ y: -8, transition: { duration: 0.3 } }}
+              className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:border-industrial-orange hover:shadow-xl transition-all duration-300 group space-y-4"
             >
-              <div className="w-12 h-12 bg-industrial-orange/10 rounded-xl flex items-center justify-center text-industrial-orange">
+              <div className="w-12 h-12 bg-industrial-orange/10 rounded-xl flex items-center justify-center text-industrial-orange group-hover:bg-industrial-orange group-hover:text-white transition-colors duration-300">
                 <Target size={28} />
               </div>
-              <h3 className="text-xl font-black text-industrial-blue uppercase">Notre Mission</h3>
+              <h3 className="text-xl font-black text-industrial-blue group-hover:text-industrial-orange transition-colors duration-300 uppercase">
+                Notre Mission
+              </h3>
               <p className="text-gray-600 text-sm leading-relaxed">
                 Fournir des solutions métallurgiques innovantes, fiables et accessibles qui garantissent la sécurité et la pérennité de chaque projet de construction de nos clients à travers tout le pays.
               </p>
             </motion.div>
 
+            {/* Carte Vision */}
             <motion.div 
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
               variants={fadeIn}
-              className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 space-y-4"
+              whileHover={{ y: -8, transition: { duration: 0.3 } }}
+              className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:border-industrial-orange hover:shadow-xl transition-all duration-300 group space-y-4"
             >
-              <div className="w-12 h-12 bg-industrial-orange/10 rounded-xl flex items-center justify-center text-industrial-orange">
+              <div className="w-12 h-12 bg-industrial-orange/10 rounded-xl flex items-center justify-center text-industrial-orange group-hover:bg-industrial-orange group-hover:text-white transition-colors duration-300">
                 <Eye size={28} />
               </div>
-              <h3 className="text-xl font-black text-industrial-blue uppercase">Notre Vision</h3>
+              <h3 className="text-xl font-black text-industrial-blue group-hover:text-industrial-orange transition-colors duration-300 uppercase">
+                Notre Vision
+              </h3>
               <p className="text-gray-600 text-sm leading-relaxed">
                 Devenir la référence absolue de l'industrie métallurgique en Afrique de l'Ouest, reconnue pour son intégrité, sa capacité d'innovation et la qualité supérieure de ses produits.
               </p>

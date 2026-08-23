@@ -19,7 +19,7 @@ const heroSlides = [
     title2: "DE VOS PROJETS !",
     slogan: "Qualité supérieure • Résistance maximale • Confiance durable",
     // Remplacez le chemin ci-dessous par votre première image (ex: "/images/slide1.jpg")
-    image: "/images/fer-beton.jpg",
+    image: "/images/images.jpg",
     badgeTitle: "Qualité Certifiée",
     badgeSub: "Satisfaction Garantie",
     badgeIcon: ShieldCheck
