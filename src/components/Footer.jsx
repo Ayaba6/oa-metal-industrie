@@ -51,11 +51,11 @@ export default function Footer() {
             <div className="space-y-3 text-xs text-gray-300">
               <div className="flex items-center gap-2">
                 <Phone size={14} className="text-industrial-orange flex-shrink-0" />
-                <span>+226 70 71 76 87 / +226 77 83 51 13</span>
+                <span>+226 50 81 46 46 / 79 09 55 52</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail size={14} className="text-industrial-orange flex-shrink-0" />
-                <span>contact@oametalindustrie.bf</span>
+                <span>contact@oametalindustrie.com</span>
               </div>
               <div className="flex items-start gap-2">
                 <MapPin size={14} className="text-industrial-orange flex-shrink-0 mt-0.5" />

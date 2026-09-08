@@ -111,7 +111,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h4 className="text-sm font-black text-industrial-blue uppercase">Téléphone / WhatsApp</h4>
-                  <p className="text-gray-600 text-xs mt-1">+226 70 71 76 87<br />+226 77 83 51 13</p>
+                  <p className="text-gray-600 text-xs mt-1">+226 50 81 46 46<br />+226 79 09 55 52</p>
                 </div>
               </div>
 

@@ -81,8 +81,8 @@ export default function Navbar() {
             <Phone size={18} className="text-industrial-orange animate-bounce flex-shrink-0" />
           </div>
           <div className="flex flex-col">
-            <span>+226 70 71 76 87</span>
-            <span className="text-gray-500 font-normal">+226 77 83 51 13</span>
+            <span>+226 50 81 46 46</span>
+            <span>+226 79 09 55 52</span>
           </div>
         </div>
 
