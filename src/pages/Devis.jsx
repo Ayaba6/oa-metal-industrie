@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, CheckCircle, Send, ArrowRight, ArrowLeft, ShieldCheck, Truck } from 'lucide-react';
+import { Calculator, CheckCircle, Send, ArrowRight, ArrowLeft, ShieldCheck, Truck, Loader2 } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -17,6 +18,7 @@ const productCategories = [
 export default function Devis() {
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     category: 'fers',
@@ -48,9 +50,40 @@ export default function Devis() {
     setStep(step - 1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setLoading(true);
+
+    // Résolution du nom complet de la catégorie sélectionnée
+    const selectedCatObj = productCategories.find(c => c.id === formData.category);
+    const categoryName = selectedCatObj ? selectedCatObj.name : formData.category;
+
+    const templateParams = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      category: categoryName,
+      itemDetail: formData.itemDetail,
+      quantity: formData.quantity,
+      unit: formData.unit,
+      delivery: formData.needDelivery ? `Oui - ${formData.deliveryLocation || 'Lieu non spécifié'}` : 'Non (Retrait sur site)',
+      notes: formData.notes || 'Aucune remarque particulière'
+    };
+
+    try {
+      await emailjs.send(
+        'service_lpbf7oq',
+        'template_aisllar',
+        templateParams,
+        'XFN5_2yIa0UjSHzHk'
+      );
+      setLoading(false);
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Erreur lors de l\'envoi EmailJS :', err);
+      alert('Une erreur est survenue lors de l\'envoi de votre demande. Veuillez réessayer.');
+      setLoading(false);
+    }
   };
 
   return (
@@ -110,7 +143,7 @@ export default function Devis() {
             <div className="space-y-2">
               <h3 className="text-3xl font-black text-industrial-blue uppercase">Demande de devis transmise !</h3>
               <p className="text-gray-600 text-sm max-w-lg mx-auto">
-                Votre demande a bien été prise en compte par notre service commercial. Un devis détaillé chiffré vous sera envoyé par e-mail ou WhatsApp dans les plus brefs délais.
+                Votre demande a bien été prise en compte et transmise à notre service commercial. Un devis détaillé chiffré vous sera envoyé par e-mail ou WhatsApp dans les plus brefs délais.
               </p>
             </div>
             <button
@@ -376,6 +409,7 @@ export default function Devis() {
                     <button 
                       type="button"
                       onClick={handlePrev}
+                      disabled={loading}
                       className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold text-xs sm:text-sm px-6 py-3.5 rounded-xl uppercase tracking-wider flex items-center gap-2 transition cursor-pointer"
                     >
                       <ArrowLeft size={16} />
@@ -383,10 +417,20 @@ export default function Devis() {
                     </button>
                     <button 
                       type="submit"
-                      className="bg-industrial-orange hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-8 py-3.5 rounded-xl uppercase tracking-wider flex items-center gap-2 transition shadow-lg cursor-pointer"
+                      disabled={loading}
+                      className="bg-industrial-orange hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-8 py-3.5 rounded-xl uppercase tracking-wider flex items-center gap-2 transition shadow-lg cursor-pointer disabled:opacity-50"
                     >
-                      <span>Soumettre ma demande de devis</span>
-                      <Send size={16} />
+                      {loading ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          <span>Envoi en cours...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Soumettre ma demande de devis</span>
+                          <Send size={16} />
+                        </>
+                      )}
                     </button>
                   </div>
                 </motion.div>
