@@ -1,257 +1,164 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import emailjs from '@emailjs/browser';
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, Loader2, MessageCircle } from 'lucide-react';
+import '../acier/acier.css';
+import { EnTetePage } from '../acier/Pages';
+import { CONTENEUR, EASE, Etiquette, TitreAcier } from '../acier/Communs';
+import { Questions } from '../acier/Sections';
+import { SITE } from '../data/site';
+import { EMAILJS } from '../data/emailjs';
 
-const fadeIn = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
-};
+const OBJETS = ['Demande de devis', 'Commande de fers à béton', 'Livraison chantier', 'Autre question'];
 
 export default function Contact() {
-  const [submitted, setSubmitted] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: 'Demande de devis',
-    message: ''
-  });
+  const [f, setF] = useState({ nom: '', tel: '', email: '', objet: OBJETS[0], message: '' });
+  const [etat, setEtat] = useState('saisie'); // saisie | envoi | envoye | erreur
+  const maj = (k) => (e) => setF({ ...f, [k]: e.target.value });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const texteWhatsApp = `Bonjour ${SITE.nom},\nObjet : ${f.objet}\n${f.message}\n\n${f.nom}${f.tel ? ` – ${f.tel}` : ''}`;
 
-  const handleSubmit = (e) => {
+  const envoyer = async (e) => {
     e.preventDefault();
-    // Simulation d'envoi du formulaire
-    setSubmitted(true);
+    setEtat('envoi');
+    try {
+      await emailjs.send(
+        EMAILJS.service,
+        EMAILJS.modele,
+        {
+          name: f.nom,
+          email: f.email,
+          phone: f.tel,
+          category: `Message de contact : ${f.objet}`,
+          itemDetail: f.message,
+          quantity: '-',
+          unit: '',
+          delivery: '-',
+          notes: 'Message envoyé depuis la page Contact du site',
+        },
+        EMAILJS.clePublique
+      );
+      setEtat('envoye');
+    } catch (err) {
+      console.error('Envoi EmailJS impossible :', err);
+      setEtat('erreur');
+    }
   };
+
+  const cartes = [
+    { icon: MapPin, titre: 'Adresse', lignes: SITE.adresse, lien: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Bassinko Station OTAM Ouagadougou')}`, action: 'Itinéraire' },
+    { icon: Phone, titre: 'Téléphone / WhatsApp', lignes: SITE.telephones.map((t) => t.affiche), lien: `tel:${SITE.telephones[0].lien}`, action: 'Appeler' },
+    { icon: Mail, titre: 'E-mail', lignes: [SITE.email], lien: `mailto:${SITE.email}`, action: 'Écrire' },
+    { icon: Clock, titre: "Heures d'ouverture", lignes: SITE.horaires },
+  ];
 
   return (
-    <div className="bg-white min-h-screen">
-      
-      {/* En-tête de la page */}
-      <section className="relative bg-industrial-blue text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <img 
-            src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=2000&q=80" 
-            alt="Contact OA Métal" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-industrial-blue via-industrial-blue/90 to-industrial-blue/60"></div>
-        </div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-          <motion.span 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-industrial-orange font-bold text-xs uppercase tracking-widest bg-industrial-orange/10 px-3 py-1 rounded-full inline-block"
-          >
-            Restons en contact
-          </motion.span>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-5xl font-black uppercase tracking-tight"
-          >
-            Contactez OA Métal Industrie
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto"
-          >
-            Une question sur nos fers à béton, besoin d'un devis pour votre chantier ou envie de devenir partenaire ? Notre équipe vous répond rapidement.
-          </motion.p>
+    <div className="ac bg-[#F3F4F6]">
+      <EnTetePage
+        fil="Contact"
+        etiquette="Restons en contact"
+        debut="Contactez"
+        accent="OA Métal"
+        texte="Une question sur nos produits, un devis pour votre chantier ou un partenariat ? Notre équipe vous répond rapidement."
+        image="/images/images1.jpg"
+      />
+
+      {/* Cartes de contact */}
+      <section className="pt-16">
+        <div className={`${CONTENEUR} grid gap-5 sm:grid-cols-2 lg:grid-cols-4`}>
+          {cartes.map((c, i) => {
+            const Icon = c.icon;
+            return (
+              <motion.div
+                key={c.titre}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.8, delay: i * 0.1, ease: EASE }}
+                className="group flex flex-col bg-white p-6"
+                style={{ borderTop: `4px solid ${i % 2 ? '#0B1B3D' : '#FF6B00'}` }}
+              >
+                <span className="flex h-12 w-12 items-center justify-center bg-[#0B1B3D] text-[#FF6B00] transition-transform duration-500 group-hover:rotate-6"><Icon size={22} /></span>
+                <p className="ac-cond mt-5 text-xs font-bold text-[#8F96A3]">{c.titre}</p>
+                {c.lignes.map((l) => <p key={l} className="mt-1 font-semibold">{l}</p>)}
+                {c.lien && (
+                  <a href={c.lien} target={c.lien.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="ac-lien mt-auto self-start pt-5 text-[#0B1B3D]">{c.action}</a>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
       </section>
 
-      {/* Section principale : Coordonnées & Formulaire */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          
-          {/* Bloc Coordonnées (à gauche) */}
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={fadeIn}
-            className="lg:col-span-5 space-y-8"
-          >
-            <div className="space-y-3">
-              <span className="text-industrial-orange font-bold text-xs uppercase tracking-widest bg-industrial-orange/10 px-3 py-1 rounded-full inline-block">
-                Informations pratiques
-              </span>
-              <h2 className="text-3xl font-black text-industrial-blue uppercase">
-                Nos Coordonnées
-              </h2>
-              <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
-                Rendez-nous visite dans nos locaux ou contactez nos services commerciaux par téléphone ou e-mail.
-              </p>
+      {/* Formulaire + carte */}
+      <section className="py-20 lg:py-28">
+        <div className={`${CONTENEUR} grid gap-10 lg:grid-cols-12`}>
+          <div className="lg:col-span-7">
+            <Etiquette>Écrivez-nous</Etiquette>
+            <TitreAcier debut="Votre demande," accent="notre réponse" className="ac-titre-m mt-5" />
+
+            <div className="ac-chanfrein mt-8 bg-white p-6 sm:p-10">
+              <AnimatePresence mode="wait">
+                {etat === 'envoye' ? (
+                  <motion.div key="ok" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="py-10 text-center">
+                    <CheckCircle2 size={56} className="mx-auto text-[#FF6B00]" />
+                    <p className="mt-5 font-['Barlow_Condensed'] text-4xl font-extrabold uppercase">Message envoyé</p>
+                    <p className="mx-auto mt-3 max-w-md text-[#5F6878]">Merci. Notre service commercial vous recontacte au plus vite.</p>
+                    <button type="button" onClick={() => { setEtat('saisie'); setF({ nom: '', tel: '', email: '', objet: OBJETS[0], message: '' }); }} className="ac-btn mt-8">Envoyer un autre message</button>
+                  </motion.div>
+                ) : (
+                  <motion.form key="form" onSubmit={envoyer} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-5">
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      <label className="block"><span className="ac-cond mb-1.5 block text-xs font-bold text-[#5F6878]">Nom ou entreprise *</span><input required value={f.nom} onChange={maj('nom')} className="ac-champ" placeholder="Ex. : Entreprise BTP Faso" autoComplete="organization" /></label>
+                      <label className="block"><span className="ac-cond mb-1.5 block text-xs font-bold text-[#5F6878]">Téléphone *</span><input required type="tel" value={f.tel} onChange={maj('tel')} className="ac-champ" placeholder="+226 …" autoComplete="tel" /></label>
+                      <label className="block"><span className="ac-cond mb-1.5 block text-xs font-bold text-[#5F6878]">E-mail *</span><input required type="email" value={f.email} onChange={maj('email')} className="ac-champ" placeholder="contact@exemple.com" autoComplete="email" /></label>
+                      <label className="block"><span className="ac-cond mb-1.5 block text-xs font-bold text-[#5F6878]">Objet</span>
+                        <select value={f.objet} onChange={maj('objet')} className="ac-champ">{OBJETS.map((o) => <option key={o}>{o}</option>)}</select>
+                      </label>
+                    </div>
+                    <label className="block"><span className="ac-cond mb-1.5 block text-xs font-bold text-[#5F6878]">Votre message *</span>
+                      <textarea required rows={5} value={f.message} onChange={maj('message')} className="ac-champ" placeholder="Précisez les diamètres, quantités ou services souhaités…" />
+                    </label>
+                    {etat === 'erreur' && (
+                      <p role="alert" className="border-l-4 border-[#FF6B00] bg-[#FFF4EC] p-4 text-sm">
+                        L'envoi par e-mail n'a pas abouti. Réessayez, ou envoyez le même message sur WhatsApp avec le bouton ci-dessous.
+                      </p>
+                    )}
+                    <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center">
+                      <button type="submit" disabled={etat === 'envoi'} className="ac-btn pm-brillance">
+                        {etat === 'envoi' ? <><Loader2 size={18} className="animate-spin" /> Envoi en cours…</> : <><Send size={18} /> Envoyer mon message</>}
+                      </button>
+                      <a href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(texteWhatsApp)}`} target="_blank" rel="noreferrer" className="ac-lien text-[#0B1B3D]">
+                        <MessageCircle size={16} /> Ou sur WhatsApp
+                      </a>
+                    </div>
+                  </motion.form>
+                )}
+              </AnimatePresence>
             </div>
+          </div>
 
-            <div className="space-y-6">
-              
-              <div className="flex items-start gap-4 p-4 bg-gray-50 border border-gray-200 rounded-2xl">
-                <div className="p-3 bg-white shadow-sm rounded-xl text-industrial-orange flex-shrink-0">
-                  <MapPin size={24} />
-                </div>
-                <div>
-                  <h4 className="text-sm font-black text-industrial-blue uppercase">Adresse principale</h4>
-                  <p className="text-gray-600 text-xs mt-1">Bassinko - Station OTAM<br />Ouagadougou - BURKINA FASO</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-4 bg-gray-50 border border-gray-200 rounded-2xl">
-                <div className="p-3 bg-white shadow-sm rounded-xl text-industrial-orange flex-shrink-0">
-                  <Phone size={24} />
-                </div>
-                <div>
-                  <h4 className="text-sm font-black text-industrial-blue uppercase">Téléphone / WhatsApp</h4>
-                  <p className="text-gray-600 text-xs mt-1">+226 50 81 46 46<br />+226 79 09 55 52</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-4 bg-gray-50 border border-gray-200 rounded-2xl">
-                <div className="p-3 bg-white shadow-sm rounded-xl text-industrial-orange flex-shrink-0">
-                  <Mail size={24} />
-                </div>
-                <div>
-                  <h4 className="text-sm font-black text-industrial-blue uppercase">E-mail</h4>
-                  <p className="text-gray-600 text-xs mt-1">contact@oametalindustrie.com</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-4 bg-gray-50 border border-gray-200 rounded-2xl">
-                <div className="p-3 bg-white shadow-sm rounded-xl text-industrial-orange flex-shrink-0">
-                  <Clock size={24} />
-                </div>
-                <div>
-                  <h4 className="text-sm font-black text-industrial-blue uppercase">Heures d'ouverture</h4>
-                  <p className="text-gray-600 text-xs mt-1">Lundi - Vendredi : 07h30 - 18h00<br />Samedi : 08h00 - 13h00</p>
-                </div>
-              </div>
-
+          <motion.div
+            className="lg:col-span-5"
+            initial={{ opacity: 0, x: 40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 1, ease: EASE }}
+          >
+            <div className="ac-chanfrein h-full min-h-[24rem] overflow-hidden bg-white p-2">
+              <iframe
+                title="Plan d'accès : Bassinko, Station OTAM, Ouagadougou"
+                src={`https://www.google.com/maps?q=${encodeURIComponent('Bassinko Station OTAM Ouagadougou')}&output=embed`}
+                className="h-full min-h-[24rem] w-full border-0 grayscale-[30%]"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
           </motion.div>
-
-          {/* Formulaire de Contact (à droite) */}
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={fadeIn}
-            className="lg:col-span-7 bg-gray-50 border border-gray-200 rounded-3xl p-8 sm:p-10 shadow-sm"
-          >
-            {submitted ? (
-              <div className="text-center py-16 space-y-4">
-                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto">
-                  <CheckCircle size={36} />
-                </div>
-                <h3 className="text-2xl font-black text-industrial-blue uppercase">Message bien reçu !</h3>
-                <p className="text-gray-600 text-sm max-w-md mx-auto">
-                  Merci pour votre demande. Notre service commercial va l'analyser et vous contactera dans les plus brefs délais.
-                </p>
-                <button
-                  onClick={() => setSubmitted(false)}
-                  className="mt-4 bg-industrial-orange text-white font-bold text-xs uppercase px-6 py-3 rounded-xl tracking-wider transition hover:bg-orange-600"
-                >
-                  Envoyer un autre message
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-black text-industrial-blue uppercase">Demande de devis ou message</h3>
-                  <p className="text-gray-600 text-xs">Remplissez le formulaire ci-dessous pour nous faire part de vos besoins.</p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-700 uppercase">Votre Nom / Entreprise *</label>
-                    <input 
-                      type="text" 
-                      name="name" 
-                      required 
-                      value={formData.name}
-                      onChange={handleChange}
-                      placeholder="Ex: Entreprise BTP Faso"
-                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-sm focus:outline-none focus:border-industrial-orange transition"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-700 uppercase">Téléphone *</label>
-                    <input 
-                      type="tel" 
-                      name="phone" 
-                      required 
-                      value={formData.phone}
-                      onChange={handleChange}
-                      placeholder="Ex: +226 70 71 76 87"
-                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-sm focus:outline-none focus:border-industrial-orange transition"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-700 uppercase">E-mail *</label>
-                    <input 
-                      type="email" 
-                      name="email" 
-                      required 
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="contact@exemple.com"
-                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-sm focus:outline-none focus:border-industrial-orange transition"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-700 uppercase">Objet de la demande</label>
-                    <select 
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-sm focus:outline-none focus:border-industrial-orange transition"
-                    >
-                      <option value="Demande de devis">Demande de devis</option>
-                      <option value="Commande fers à béton">Commande fers à béton</option>
-                      <option value="Livraison chantier">Livraison chantier</option>
-                      <option value="Autre question">Autre question</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-gray-700 uppercase">Votre Message / Détails des matériaux *</label>
-                  <textarea 
-                    name="message" 
-                    rows="4" 
-                    required 
-                    value={formData.message}
-                    onChange={handleChange}
-                    placeholder="Précisez les diamètres, quantités ou services souhaités..."
-                    className="w-full bg-white border border-gray-300 rounded-xl p-4 text-xs sm:text-sm focus:outline-none focus:border-industrial-orange transition"
-                  ></textarea>
-                </div>
-
-                <button 
-                  type="submit" 
-                  className="w-full bg-industrial-orange hover:bg-orange-600 text-white font-bold text-xs sm:text-sm uppercase tracking-wider py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg cursor-pointer"
-                >
-                  <span>Envoyer ma demande</span>
-                  <Send size={18} />
-                </button>
-              </form>
-            )}
-          </motion.div>
-
         </div>
       </section>
 
+      <Questions />
     </div>
   );
 }

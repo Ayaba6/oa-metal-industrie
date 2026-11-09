@@ -3,9 +3,41 @@
 @tailwind utilities;
 
 body {
-  @apply bg-white text-gray-800 antialiased;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  @apply bg-white text-gray-800 antialiased font-sans;
 }
 html {
   scroll-behavior: smooth;
+}
+
+@layer components {
+  /* Petit sur-titre de section : "— 01  Nos produits" */
+  .eyebrow {
+    @apply inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-industrial-orange;
+  }
+  .eyebrow::before {
+    content: '';
+    @apply block h-px w-8 bg-industrial-orange;
+  }
+  .titre-section {
+    @apply font-display font-extrabold uppercase leading-[0.95] tracking-tight text-industrial-blue text-4xl sm:text-5xl lg:text-6xl;
+  }
+  .btn-orange {
+    @apply inline-flex items-center justify-center gap-2 bg-industrial-orange px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-orange-600;
+  }
+  .btn-contour {
+    @apply inline-flex items-center justify-center gap-2 border border-current px-6 py-3.5 text-sm font-bold uppercase tracking-wider transition;
+  }
+  .chip {
+    @apply cursor-pointer border px-3 py-2 text-sm font-semibold transition;
+  }
+  .chip-on {
+    @apply border-industrial-blue bg-industrial-blue text-white;
+  }
+  .chip-off {
+    @apply border-gray-300 bg-white text-gray-700 hover:border-industrial-blue;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none; }
 }

@@ -1,100 +1,96 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Clock, Globe, Share2, Send, MessageCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, MessageCircle } from 'lucide-react';
+import { SITE, NAV, CATALOGUE } from '../data/site';
 
 export default function Footer() {
   return (
-    <footer className="bg-industrial-blue text-white pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-16 border-b border-white/10">
-          
-          {/* Colonne 1 : Logo & Infos */}
-          <div className="space-y-4">
-            <div className="flex items-center">
-              <Link to="/" className="inline-block bg-white px-3 py-2 rounded hover:opacity-95 transition">
-                <img 
-                  src="/logo.jpeg" 
-                  alt="OA Métal Industrie" 
-                  className="h-10 w-auto object-contain"
-                  onError={(e) => { e.target.style.display = 'none'; }}
-                />
-              </Link>
-            </div>
-            <p className="text-xs text-gray-400 leading-relaxed">
-              Votre partenaire de confiance pour la fourniture de produits métalliques de qualité au Burkina Faso. Le métal qui inspire confiance !
-            </p>
-            <div className="flex items-center gap-3 pt-2">
-              <a href="#" className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-industrial-orange transition" title="Réseau social"><Globe size={16} /></a>
-              <a href="#" className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-industrial-orange transition" title="Partage"><Share2 size={16} /></a>
-              <a href="#" className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-industrial-orange transition" title="Discussion"><MessageCircle size={16} /></a>
-            </div>
-          </div>
-
-          {/* Colonne 2 : Liens rapides */}
-          <div>
-            <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-industrial-orange">Liens rapides</h4>
-            <ul className="space-y-2 text-xs text-gray-300">
-              <li><Link to="/" className="hover:text-industrial-orange transition">Accueil</Link></li>
-              <li><Link to="/apropos" className="hover:text-industrial-orange transition">À propos</Link></li>
-              <li><Link to="/produits" className="hover:text-industrial-orange transition">Produits</Link></li>
-              <li><Link to="/services" className="hover:text-industrial-orange transition">Services</Link></li>
-              <li><Link to="/realisations" className="hover:text-industrial-orange transition">Réalisations</Link></li>
-              <li><Link to="/actualites" className="hover:text-industrial-orange transition">Actualités</Link></li>
-              <li><Link to="/contact" className="hover:text-industrial-orange transition">Contact</Link></li>
-            </ul>
-          </div>
-
-          {/* Colonne 3 : Contact & Horaires */}
-          <div>
-            <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-industrial-orange">Contact</h4>
-            <div className="space-y-3 text-xs text-gray-300">
-              <div className="flex items-center gap-2">
-                <Phone size={14} className="text-industrial-orange flex-shrink-0" />
-                <span>+226 50 81 46 46 / 79 09 55 52</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail size={14} className="text-industrial-orange flex-shrink-0" />
-                <span>contact@oametalindustrie.com</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <MapPin size={14} className="text-industrial-orange flex-shrink-0 mt-0.5" />
-                <span>Bassinko - Station OTAM<br />Ouagadougou - BURKINA FASO</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Clock size={14} className="text-industrial-orange flex-shrink-0 mt-0.5" />
-                <span>Lun - Ven : 7h30 - 18h00<br />Samedi : 8h00 - 13h00</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Colonne 4 : Newsletter */}
-          <div>
-            <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-industrial-orange">Newsletter</h4>
-            <p className="text-xs text-gray-300 mb-4">Abonnez-vous pour recevoir nos actualités et offres.</p>
-            <form onSubmit={(e) => e.preventDefault()} className="space-y-2">
-              <input 
-                type="email" 
-                placeholder="Votre email" 
-                className="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-industrial-orange"
-              />
-              <button type="submit" className="w-full bg-industrial-orange hover:bg-orange-600 text-white font-bold text-xs uppercase py-2.5 rounded transition flex items-center justify-center gap-2 cursor-pointer">
-                S'abonner <Send size={14} />
-              </button>
-            </form>
-          </div>
-
+    <footer className="bg-industrial-blue text-white">
+      {/* Grand slogan */}
+      <div className="border-b border-industrial-line">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+          <p className="font-display text-5xl font-extrabold uppercase leading-[0.9] tracking-tight sm:text-7xl">
+            Le métal qui inspire <span className="text-industrial-orange">confiance.</span>
+          </p>
         </div>
+      </div>
 
-        {/* Copyright */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400">
-          <p>© 2026 OA Métal Industrie. Tous droits réservés.</p>
-          <div className="flex gap-6 mt-4 sm:mt-0">
-            <a href="#" className="hover:underline">Mentions légales</a>
-            <a href="#" className="hover:underline">Politique de confidentialité</a>
+      <div className="mx-auto grid max-w-7xl gap-12 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-12 lg:px-8">
+        <div className="space-y-5 lg:col-span-4">
+          <Link to="/" className="inline-block bg-white px-3 py-2">
+            <img src="/logo.jpeg" alt="OA Métal Industrie" className="h-10 w-auto object-contain" />
+          </Link>
+          <p className="max-w-xs text-sm leading-relaxed text-white/60">
+            Votre partenaire de confiance pour la fourniture de produits métalliques de qualité au Burkina Faso.
+          </p>
+          <div className="border border-industrial-line p-5">
+            <p className="font-display text-lg font-bold uppercase">Cotation WhatsApp</p>
+            <p className="mt-1 text-sm text-white/60">Envoyez une photo de votre plan ou de votre liste : nous répondons avec un prix.</p>
+            <a
+              href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(`Bonjour ${SITE.nom}, je souhaite un devis pour :`)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-orange mt-4 !py-2.5"
+            >
+              <MessageCircle size={16} /> Écrire sur WhatsApp
+            </a>
           </div>
         </div>
 
+        <div className="lg:col-span-2">
+          <h4 className="mb-5 text-[11px] font-bold uppercase tracking-[0.2em] text-industrial-orange">Navigation</h4>
+          <ul className="space-y-2.5 text-sm text-white/75">
+            {NAV.map((n) => (
+              <li key={n.to}><Link to={n.to} className="hover:text-white">{n.label}</Link></li>
+            ))}
+            <li><Link to="/devis" className="hover:text-white">Demander un devis</Link></li>
+          </ul>
+        </div>
+
+        <div className="lg:col-span-2">
+          <h4 className="mb-5 text-[11px] font-bold uppercase tracking-[0.2em] text-industrial-orange">Produits</h4>
+          <ul className="space-y-2.5 text-sm text-white/75">
+            {CATALOGUE.map((p) => (
+              <li key={p.titre}><Link to="/produits" className="hover:text-white">{p.titre}</Link></li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="lg:col-span-4">
+          <h4 className="mb-5 text-[11px] font-bold uppercase tracking-[0.2em] text-industrial-orange">Contact</h4>
+          <ul className="space-y-4 text-sm text-white/75">
+            <li className="flex gap-3">
+              <Phone size={16} className="mt-0.5 shrink-0 text-industrial-orange" />
+              <span>
+                {SITE.telephones.map((t) => (
+                  <a key={t.lien} href={`tel:${t.lien}`} className="block hover:text-white">{t.affiche}</a>
+                ))}
+              </span>
+            </li>
+            <li className="flex gap-3">
+              <Mail size={16} className="mt-0.5 shrink-0 text-industrial-orange" />
+              <a href={`mailto:${SITE.email}`} className="hover:text-white">{SITE.email}</a>
+            </li>
+            <li className="flex gap-3">
+              <MapPin size={16} className="mt-0.5 shrink-0 text-industrial-orange" />
+              <span>{SITE.adresse.map((l) => <span key={l} className="block">{l}</span>)}</span>
+            </li>
+            <li className="flex gap-3">
+              <Clock size={16} className="mt-0.5 shrink-0 text-industrial-orange" />
+              <span>{SITE.horaires.map((l) => <span key={l} className="block">{l}</span>)}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="border-t border-industrial-line">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <p>© {new Date().getFullYear()} OA Métal Industrie · Tous droits réservés</p>
+          <div className="flex gap-6">
+            <a href="#" className="hover:text-white">Mentions légales</a>
+            <a href="#" className="hover:text-white">Politique de confidentialité</a>
+          </div>
+        </div>
       </div>
     </footer>
   );

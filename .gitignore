@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Sauvegardes de l’ancien design (déjà présentes dans l’historique git)
+_ancien-design/

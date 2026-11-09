@@ -1,448 +1,308 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, CheckCircle, Send, ArrowRight, ArrowLeft, ShieldCheck, Truck, Loader2 } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import emailjs from '@emailjs/browser';
+import { ArrowRight, ArrowLeft, Send, CheckCircle2, Loader2, Truck, ShieldCheck, Phone, MessageCircle, Trash2 } from 'lucide-react';
+import '../acier/acier.css';
+import { EnTetePage } from '../acier/Pages';
+import { CONTENEUR, EASE } from '../acier/Communs';
+import { SITE } from '../data/site';
+import { EMAILJS } from '../data/emailjs';
+import { CATEGORIES_DEVIS } from '../data/pages';
+import { useDemande } from '../context/Demande';
 
-const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
-};
-
-const productCategories = [
-  { id: 'fers', name: 'Fers à béton (HA & Lisse)', diameters: ['8 mm', '10 mm', '12 mm', '16 mm', '20 mm', '25 mm', '32 mm'] },
-  { id: 'toles', name: 'Tôles & Couvertures', types: ['Tôles ondulées galvanisées', 'Tôles bacs aluminium', 'Tôles bacs aciers laqués'] },
-  { id: 'profiles', name: 'Profilés & Poutrelles', types: ['IPE', 'HEB', 'UPN', 'Tubes ronds', 'Tubes rectangulaires'] },
-  { id: 'autre', name: 'Autres matériaux / Consommables', types: ['Treillis soudé', 'Fils de ligature', 'Pointes'] }
+const UNITES = [
+  { id: 'barres', l: 'Barres / unités' },
+  { id: 'tonnes', l: 'Tonnes' },
+  { id: 'bottes', l: 'Bottes / paquets' },
+  { id: 'feuilles', l: 'Feuilles' },
+  { id: 'rouleaux', l: 'Rouleaux' },
 ];
+const ETAPES = ['Produit', 'Quantité & livraison', 'Coordonnées'];
+const VIDE = { category: 'fers', itemDetail: '', quantity: '', unit: 'barres', needDelivery: true, deliveryLocation: '', name: '', phone: '', email: '', notes: '' };
+
+function Libelle({ children }) {
+  return <span className="ac-cond mb-1.5 block text-xs font-bold text-[#5F6878]">{children}</span>;
+}
 
 export default function Devis() {
-  const [step, setStep] = useState(1);
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    category: 'fers',
-    itemDetail: '',
-    quantity: '',
-    unit: 'barres', // barres, bottes, feuilles, tonnes
-    needDelivery: true,
-    deliveryLocation: '',
-    name: '',
-    phone: '',
-    email: '',
-    notes: ''
-  });
+  const { lignes, retirer, vider } = useDemande();
+  const [etape, setEtape] = useState(1);
+  const [sens, setSens] = useState(1);
+  const [etat, setEtat] = useState('saisie'); // saisie | envoi | envoye | erreur
+  const [d, setD] = useState(VIDE);
+  const maj = (k) => (e) => setD({ ...d, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value });
+  const cat = CATEGORIES_DEVIS.find((c) => c.id === d.category);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
-  };
+  const aller = (n) => { setSens(n > etape ? 1 : -1); setEtape(n); window.scrollTo({ top: document.getElementById('formulaire-devis')?.offsetTop - 120, behavior: 'smooth' }); };
 
-  const handleNext = (e) => {
+  const envoyer = async (e) => {
     e.preventDefault();
-    setStep(step + 1);
-  };
-
-  const handlePrev = () => {
-    setStep(step - 1);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    // Résolution du nom complet de la catégorie sélectionnée
-    const selectedCatObj = productCategories.find(c => c.id === formData.category);
-    const categoryName = selectedCatObj ? selectedCatObj.name : formData.category;
-
-    const templateParams = {
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      category: categoryName,
-      itemDetail: formData.itemDetail,
-      quantity: formData.quantity,
-      unit: formData.unit,
-      delivery: formData.needDelivery ? `Oui - ${formData.deliveryLocation || 'Lieu non spécifié'}` : 'Non (Retrait sur site)',
-      notes: formData.notes || 'Aucune remarque particulière'
-    };
-
+    setEtat('envoi');
+    const selection = lignes.length ? `\nSélection depuis le site :\n${lignes.map((l, k) => `${k + 1}. ${l.produit} : ${l.detail}`).join('\n')}` : '';
     try {
       await emailjs.send(
-        'service_lpbf7oq',
-        'template_aisllar',
-        templateParams,
-        'XFN5_2yIa0UjSHzHk'
+        EMAILJS.service,
+        EMAILJS.modele,
+        {
+          name: d.name,
+          email: d.email,
+          phone: d.phone,
+          category: cat ? cat.nom : d.category,
+          itemDetail: d.itemDetail,
+          quantity: d.quantity,
+          unit: d.unit,
+          delivery: d.needDelivery ? `Oui - ${d.deliveryLocation || 'Lieu non spécifié'}` : 'Non (retrait au dépôt)',
+          notes: (d.notes || 'Aucune remarque particulière') + selection,
+        },
+        EMAILJS.clePublique
       );
-      setLoading(false);
-      setSubmitted(true);
+      setEtat('envoye');
     } catch (err) {
-      console.error('Erreur lors de l\'envoi EmailJS :', err);
-      alert('Une erreur est survenue lors de l\'envoi de votre demande. Veuillez réessayer.');
-      setLoading(false);
+      console.error('Envoi EmailJS impossible :', err);
+      setEtat('erreur');
     }
   };
 
+  const texteWhatsApp =
+    `Bonjour ${SITE.nom}, je souhaite un devis.\n` +
+    `${cat?.nom} : ${d.itemDetail}\nQuantité : ${d.quantity} ${d.unit}\n` +
+    `Livraison : ${d.needDelivery ? d.deliveryLocation || 'oui' : 'non'}\n` +
+    (lignes.length ? `${lignes.map((l, k) => `${k + 1}. ${l.produit} : ${l.detail}`).join('\n')}\n` : '') +
+    `${d.name} – ${d.phone}`;
+
+  const variantes = {
+    entre: (s) => ({ opacity: 0, x: s * 60 }),
+    centre: { opacity: 1, x: 0 },
+    sort: (s) => ({ opacity: 0, x: s * -60 }),
+  };
+
   return (
-    <div className="bg-white min-h-screen">
-      
-      {/* En-tête de la page */}
-      <section className="relative bg-industrial-blue text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <img 
-            src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=2000&q=80" 
-            alt="Demande de devis OA Métal" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-industrial-blue via-industrial-blue/90 to-industrial-blue/60"></div>
-        </div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-          <motion.span 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-industrial-orange font-bold text-xs uppercase tracking-widest bg-industrial-orange/10 px-3 py-1 rounded-full inline-block"
-          >
-            Estimation en ligne
-          </motion.span>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-5xl font-black uppercase tracking-tight"
-          >
-            Demander un Devis Personnalisé
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto"
-          >
-            Configurez votre liste de matériaux et obtenez une cotation précise avec nos options de livraison sur chantier au Burkina Faso.
-          </motion.p>
-        </div>
-      </section>
+    <div className="ac bg-[#F3F4F6]">
+      <EnTetePage
+        fil="Devis"
+        etiquette="Estimation gratuite"
+        debut="Demander"
+        accent="un devis"
+        texte="Configurez votre liste de matériaux et recevez une cotation précise, avec livraison sur chantier partout au Burkina Faso."
+        image="/images/fer-beton.jpg"
+      />
 
-      {/* Formulaire de Devis interactif */}
-      <section className="py-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {submitted ? (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-gray-50 border border-gray-200 rounded-3xl p-10 sm:p-16 text-center space-y-6 shadow-sm"
-          >
-            <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle size={40} />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-3xl font-black text-industrial-blue uppercase">Demande de devis transmise !</h3>
-              <p className="text-gray-600 text-sm max-w-lg mx-auto">
-                Votre demande a bien été prise en compte et transmise à notre service commercial. Un devis détaillé chiffré vous sera envoyé par e-mail ou WhatsApp dans les plus brefs délais.
-              </p>
-            </div>
-            <button
-              onClick={() => {
-                setSubmitted(false);
-                setStep(1);
-                setFormData({
-                  category: 'fers',
-                  itemDetail: '',
-                  quantity: '',
-                  unit: 'barres',
-                  needDelivery: true,
-                  deliveryLocation: '',
-                  name: '',
-                  phone: '',
-                  email: '',
-                  notes: ''
-                });
-              }}
-              className="bg-industrial-orange text-white font-bold text-xs uppercase px-8 py-4 rounded-xl tracking-wider transition hover:bg-orange-600 shadow-lg cursor-pointer"
-            >
-              Effectuer une autre demande
-            </button>
-          </motion.div>
-        ) : (
-          <div className="bg-gray-50 border border-gray-200 rounded-3xl p-6 sm:p-10 shadow-sm">
-            
-            {/* Barre de progression des étapes */}
-            <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-industrial-orange text-white rounded-xl font-black flex items-center justify-center text-sm shadow">
-                  {step}
+      <section id="formulaire-devis" className="py-20 lg:py-28">
+        <div className={`${CONTENEUR} grid gap-10 lg:grid-cols-12`}>
+          {/* Formulaire */}
+          <div className="lg:col-span-8">
+            <div className="ac-chanfrein bg-white">
+              {/* Indicateur d'étapes */}
+              {etat !== 'envoye' && (
+                <div className="border-b border-[#EEF0F3] px-6 pt-6 sm:px-10">
+                  <ol className="grid grid-cols-3 gap-2">
+                    {ETAPES.map((t, i) => {
+                      const n = i + 1;
+                      const fait = etape > n;
+                      const actif = etape === n;
+                      return (
+                        <li key={t}>
+                          <button type="button" disabled={n > etape} onClick={() => aller(n)} className="flex w-full items-center gap-3 text-left disabled:cursor-default">
+                            <span className={`ac-chanfrein-sm flex h-10 w-10 shrink-0 items-center justify-center font-['Barlow_Condensed'] text-lg font-extrabold transition-colors duration-500 ${actif || fait ? 'bg-[#FF6B00] text-[#0B1B3D]' : 'bg-[#F3F4F6] text-[#8F96A3]'}`}>
+                              {fait ? '✓' : `0${n}`}
+                            </span>
+                            <span className={`ac-cond hidden text-sm font-bold sm:block ${actif ? 'text-[#0B1B3D]' : 'text-[#8F96A3]'}`}>{t}</span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                  <div className="relative mt-5 h-[3px] bg-[#EEF0F3]">
+                    <motion.span className="absolute inset-y-0 left-0 bg-[#FF6B00]" animate={{ width: `${(etape / 3) * 100}%` }} transition={{ duration: 0.6, ease: EASE }} />
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-sm font-black text-industrial-blue uppercase">
-                    {step === 1 && "Étape 1 : Choix des matériaux"}
-                    {step === 2 && "Étape 2 : Quantité & Livraison"}
-                    {step === 3 && "Étape 3 : Coordonnées de contact"}
-                  </h4>
-                  <p className="text-[11px] text-gray-500">Étape {step} sur 3</p>
-                </div>
-              </div>
-              <div className="hidden sm:flex gap-1">
-                <div className={`w-12 h-2 rounded-full ${step >= 1 ? 'bg-industrial-orange' : 'bg-gray-200'}`}></div>
-                <div className={`w-12 h-2 rounded-full ${step >= 2 ? 'bg-industrial-orange' : 'bg-gray-200'}`}></div>
-                <div className={`w-12 h-2 rounded-full ${step >= 3 ? 'bg-industrial-orange' : 'bg-gray-200'}`}></div>
-              </div>
-            </div>
-
-            <form onSubmit={step === 3 ? handleSubmit : handleNext}>
-              
-              {/* ÉTAPE 1 : Choix du produit */}
-              {step === 1 && (
-                <motion.div variants={fadeIn} initial="hidden" animate="visible" className="space-y-6">
-                  <div className="space-y-1">
-                    <h3 className="text-lg font-black text-industrial-blue uppercase">Sélectionnez la catégorie principale</h3>
-                    <p className="text-xs text-gray-600">Choisissez le type de produit métallique recherché pour votre projet.</p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {productCategories.map((cat) => (
-                      <label 
-                        key={cat.id}
-                        className={`flex flex-col p-5 rounded-2xl border-2 transition-all cursor-pointer ${
-                          formData.category === cat.id 
-                            ? 'border-industrial-orange bg-white shadow-md' 
-                            : 'border-gray-200 bg-white/50 hover:border-gray-300'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <input 
-                            type="radio" 
-                            name="category" 
-                            value={cat.id} 
-                            checked={formData.category === cat.id}
-                            onChange={handleChange}
-                            className="accent-industrial-orange"
-                          />
-                          <Calculator size={18} className={formData.category === cat.id ? 'text-industrial-orange' : 'text-gray-400'} />
-                        </div>
-                        <span className="font-bold text-sm text-industrial-blue uppercase">{cat.name}</span>
-                      </label>
-                    ))}
-                  </div>
-
-                  <div className="space-y-1.5 pt-4">
-                    <label className="text-xs font-bold text-gray-700 uppercase">Précisions sur le produit (Diamètre, Référence, Nuance) *</label>
-                    <input 
-                      type="text" 
-                      name="itemDetail" 
-                      required
-                      value={formData.itemDetail}
-                      onChange={handleChange}
-                      placeholder="Ex: Fer HA 12mm ou Tôle bac alu épaisseur 0.5mm"
-                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-sm focus:outline-none focus:border-industrial-orange transition"
-                    />
-                  </div>
-
-                  <div className="flex justify-end pt-4">
-                    <button 
-                      type="submit"
-                      className="bg-industrial-orange hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-6 py-3.5 rounded-xl uppercase tracking-wider flex items-center gap-2 transition shadow cursor-pointer"
-                    >
-                      <span>Continuer</span>
-                      <ArrowRight size={16} />
-                    </button>
-                  </div>
-                </motion.div>
               )}
 
-              {/* ÉTAPE 2 : Quantité et Livraison */}
-              {step === 2 && (
-                <motion.div variants={fadeIn} initial="hidden" animate="visible" className="space-y-6">
-                  <div className="space-y-1">
-                    <h3 className="text-lg font-black text-industrial-blue uppercase">Quantité et Logistique</h3>
-                    <p className="text-xs text-gray-600">Indiquez les volumes nécessaires et si vous avez besoin d'une livraison sur chantier.</p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700 uppercase">Quantité estimée *</label>
-                      <input 
-                        type="text" 
-                        name="quantity" 
-                        required
-                        value={formData.quantity}
-                        onChange={handleChange}
-                        placeholder="Ex: 150 ou 2 tonnes"
-                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-sm focus:outline-none focus:border-industrial-orange transition"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700 uppercase">Unité</label>
-                      <select 
-                        name="unit"
-                        value={formData.unit}
-                        onChange={handleChange}
-                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-sm focus:outline-none focus:border-industrial-orange transition"
-                      >
-                        <option value="barres">Barres / Unités</option>
-                        <option value="tonnes">Tonnes</option>
-                        <option value="bottes">Bottes / Paquets</option>
-                        <option value="feuilles">Feuilles</option>
-                        <option value="rouleaux">Rouleaux</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 pt-2">
-                    <label className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-2xl cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        name="needDelivery"
-                        checked={formData.needDelivery}
-                        onChange={handleChange}
-                        className="w-4 h-4 accent-industrial-orange"
-                      />
-                      <div className="flex items-center gap-2">
-                        <Truck size={20} className="text-industrial-orange" />
-                        <span className="text-xs sm:text-sm font-bold text-industrial-blue uppercase">J'ai besoin d'une livraison sur mon chantier</span>
-                      </div>
-                    </label>
-                  </div>
-
-                  {formData.needDelivery && (
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700 uppercase">Lieu / Ville de livraison *</label>
-                      <input 
-                        type="text" 
-                        name="deliveryLocation" 
-                        required={formData.needDelivery}
-                        value={formData.deliveryLocation}
-                        onChange={handleChange}
-                        placeholder="Ex: Ouagadougou (Quartier Ouaga 2000) ou Bobo-Dioulasso"
-                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-sm focus:outline-none focus:border-industrial-orange transition"
-                      />
-                    </div>
-                  )}
-
-                  <div className="flex justify-between pt-4">
-                    <button 
-                      type="button"
-                      onClick={handlePrev}
-                      className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold text-xs sm:text-sm px-6 py-3.5 rounded-xl uppercase tracking-wider flex items-center gap-2 transition cursor-pointer"
+              <div className="overflow-hidden p-6 sm:p-10">
+                <AnimatePresence mode="wait" custom={sens}>
+                  {etat === 'envoye' ? (
+                    <motion.div key="ok" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="py-10 text-center">
+                      <CheckCircle2 size={60} className="mx-auto text-[#FF6B00]" />
+                      <p className="mt-5 font-['Barlow_Condensed'] text-5xl font-extrabold uppercase">Demande transmise</p>
+                      <p className="mx-auto mt-3 max-w-md text-[#5F6878]">Votre demande a bien été transmise à notre service commercial. Un devis détaillé vous sera envoyé par e-mail ou WhatsApp.</p>
+                      <button type="button" onClick={() => { setEtat('saisie'); setD(VIDE); setEtape(1); vider(); }} className="ac-btn mt-8">Faire une autre demande</button>
+                    </motion.div>
+                  ) : (
+                    <motion.form
+                      key={etape}
+                      custom={sens}
+                      variants={variantes}
+                      initial="entre"
+                      animate="centre"
+                      exit="sort"
+                      transition={{ duration: 0.45, ease: EASE }}
+                      onSubmit={etape < 3 ? (e) => { e.preventDefault(); aller(etape + 1); } : envoyer}
+                      className="space-y-7"
                     >
-                      <ArrowLeft size={16} />
-                      <span>Retour</span>
-                    </button>
-                    <button 
-                      type="submit"
-                      className="bg-industrial-orange hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-6 py-3.5 rounded-xl uppercase tracking-wider flex items-center gap-2 transition shadow cursor-pointer"
-                    >
-                      <span>Continuer</span>
-                      <ArrowRight size={16} />
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* ÉTAPE 3 : Coordonnées */}
-              {step === 3 && (
-                <motion.div variants={fadeIn} initial="hidden" animate="visible" className="space-y-6">
-                  <div className="space-y-1">
-                    <h3 className="text-lg font-black text-industrial-blue uppercase">Vos Coordonnées</h3>
-                    <p className="text-xs text-gray-600">Où devons-nous vous envoyer votre devis chiffré ?</p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700 uppercase">Nom / Entreprise *</label>
-                      <input 
-                        type="text" 
-                        name="name" 
-                        required
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder="Ex: Jean Kaboré / BTP Faso"
-                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-sm focus:outline-none focus:border-industrial-orange transition"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700 uppercase">Téléphone / WhatsApp *</label>
-                      <input 
-                        type="tel" 
-                        name="phone" 
-                        required
-                        value={formData.phone}
-                        onChange={handleChange}
-                        placeholder="Ex: +226 70 00 00 00"
-                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-sm focus:outline-none focus:border-industrial-orange transition"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-700 uppercase">E-mail *</label>
-                    <input 
-                      type="email" 
-                      name="email" 
-                      required
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="contact@exemple.com"
-                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-sm focus:outline-none focus:border-industrial-orange transition"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-700 uppercase">Remarques ou instructions particulières (Optionnel)</label>
-                    <textarea 
-                      name="notes" 
-                      rows="3"
-                      value={formData.notes}
-                      onChange={handleChange}
-                      placeholder="Précisions sur les délais souhaités ou demandes de coupe sur mesure..."
-                      className="w-full bg-white border border-gray-300 rounded-xl p-4 text-xs sm:text-sm focus:outline-none focus:border-industrial-orange transition"
-                    ></textarea>
-                  </div>
-
-                  <div className="flex justify-between pt-4">
-                    <button 
-                      type="button"
-                      onClick={handlePrev}
-                      disabled={loading}
-                      className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold text-xs sm:text-sm px-6 py-3.5 rounded-xl uppercase tracking-wider flex items-center gap-2 transition cursor-pointer"
-                    >
-                      <ArrowLeft size={16} />
-                      <span>Retour</span>
-                    </button>
-                    <button 
-                      type="submit"
-                      disabled={loading}
-                      className="bg-industrial-orange hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-8 py-3.5 rounded-xl uppercase tracking-wider flex items-center gap-2 transition shadow-lg cursor-pointer disabled:opacity-50"
-                    >
-                      {loading ? (
+                      {etape === 1 && (
                         <>
-                          <Loader2 size={16} className="animate-spin" />
-                          <span>Envoi en cours...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Soumettre ma demande de devis</span>
-                          <Send size={16} />
+                          <div>
+                            <h2 className="font-['Barlow_Condensed'] text-3xl font-extrabold uppercase">Catégorie principale</h2>
+                            <p className="mt-1 text-sm text-[#5F6878]">Choisissez le type de produit métallique recherché.</p>
+                          </div>
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            {CATEGORIES_DEVIS.map((c) => (
+                              <button
+                                key={c.id}
+                                type="button"
+                                aria-pressed={d.category === c.id}
+                                onClick={() => setD({ ...d, category: c.id, itemDetail: '' })}
+                                className="ac-puce flex items-center justify-between px-5 py-4 text-left text-base"
+                              >
+                                {c.nom}
+                                <span className={`h-3 w-3 rotate-45 ${d.category === c.id ? 'bg-[#0B1B3D]' : 'bg-[#D9DCE1]'}`} />
+                              </button>
+                            ))}
+                          </div>
+                          <div>
+                            <Libelle>Références courantes</Libelle>
+                            <div className="flex flex-wrap gap-2">
+                              {cat.options.map((o) => (
+                                <button key={o} type="button" aria-pressed={d.itemDetail === o} onClick={() => setD({ ...d, itemDetail: o })} className="ac-puce px-3.5 py-2 text-sm">{o}</button>
+                              ))}
+                            </div>
+                          </div>
+                          <label className="block">
+                            <Libelle>Précisions sur le produit (diamètre, référence, nuance) *</Libelle>
+                            <input required value={d.itemDetail} onChange={maj('itemDetail')} className="ac-champ" placeholder="Ex. : fer HA 12 mm ou tôle bac épaisseur 0,5 mm" />
+                          </label>
                         </>
                       )}
-                    </button>
-                  </div>
-                </motion.div>
-              )}
 
-            </form>
+                      {etape === 2 && (
+                        <>
+                          <div>
+                            <h2 className="font-['Barlow_Condensed'] text-3xl font-extrabold uppercase">Quantité & logistique</h2>
+                            <p className="mt-1 text-sm text-[#5F6878]">Indiquez les volumes et si vous avez besoin d'une livraison sur chantier.</p>
+                          </div>
+                          <div className="grid gap-5 sm:grid-cols-2">
+                            <label className="block"><Libelle>Quantité estimée *</Libelle><input required value={d.quantity} onChange={maj('quantity')} className="ac-champ" placeholder="Ex. : 150 ou 2" /></label>
+                            <div>
+                              <Libelle>Unité</Libelle>
+                              <div className="flex flex-wrap gap-2">
+                                {UNITES.map((u) => <button key={u.id} type="button" aria-pressed={d.unit === u.id} onClick={() => setD({ ...d, unit: u.id })} className="ac-puce px-3 py-2 text-xs">{u.l}</button>)}
+                              </div>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            aria-pressed={d.needDelivery}
+                            onClick={() => setD({ ...d, needDelivery: !d.needDelivery })}
+                            className={`flex w-full items-center gap-4 border p-5 text-left transition-colors ${d.needDelivery ? 'border-[#FF6B00] bg-[#FFF4EC]' : 'border-[#D9DCE1] bg-white'}`}
+                          >
+                            <span className={`flex h-12 w-12 shrink-0 items-center justify-center ${d.needDelivery ? 'bg-[#FF6B00] text-[#0B1B3D]' : 'bg-[#F3F4F6] text-[#8F96A3]'}`}><Truck size={22} /></span>
+                            <span className="flex-1">
+                              <span className="block font-['Barlow_Condensed'] text-xl font-extrabold uppercase">J'ai besoin d'une livraison sur mon chantier</span>
+                              <span className="text-sm text-[#5F6878]">Sinon, retrait au dépôt de Bassinko.</span>
+                            </span>
+                            <span className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${d.needDelivery ? 'bg-[#0B1B3D]' : 'bg-[#D9DCE1]'}`}>
+                              <motion.span className="absolute top-1 h-4 w-4 rounded-full bg-white" animate={{ left: d.needDelivery ? 24 : 4 }} />
+                            </span>
+                          </button>
+                          <AnimatePresence initial={false}>
+                            {d.needDelivery && (
+                              <motion.label initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="block overflow-hidden">
+                                <Libelle>Lieu / ville de livraison *</Libelle>
+                                <input required value={d.deliveryLocation} onChange={maj('deliveryLocation')} className="ac-champ" placeholder="Ex. : Ouaga 2000 ou Bobo-Dioulasso" />
+                              </motion.label>
+                            )}
+                          </AnimatePresence>
+                        </>
+                      )}
 
+                      {etape === 3 && (
+                        <>
+                          <div>
+                            <h2 className="font-['Barlow_Condensed'] text-3xl font-extrabold uppercase">Vos coordonnées</h2>
+                            <p className="mt-1 text-sm text-[#5F6878]">Où devons-nous vous envoyer votre devis chiffré ?</p>
+                          </div>
+                          <div className="grid gap-5 sm:grid-cols-2">
+                            <label className="block"><Libelle>Nom / entreprise *</Libelle><input required value={d.name} onChange={maj('name')} className="ac-champ" placeholder="Ex. : Jean Kaboré / BTP Faso" autoComplete="organization" /></label>
+                            <label className="block"><Libelle>Téléphone / WhatsApp *</Libelle><input required type="tel" value={d.phone} onChange={maj('phone')} className="ac-champ" placeholder="+226 …" autoComplete="tel" /></label>
+                          </div>
+                          <label className="block"><Libelle>E-mail *</Libelle><input required type="email" value={d.email} onChange={maj('email')} className="ac-champ" placeholder="contact@exemple.com" autoComplete="email" /></label>
+                          <label className="block"><Libelle>Remarques (facultatif)</Libelle><textarea rows={4} value={d.notes} onChange={maj('notes')} className="ac-champ" placeholder="Délais souhaités, demandes de coupe sur mesure…" /></label>
+                          {etat === 'erreur' && (
+                            <p role="alert" className="border-l-4 border-[#FF6B00] bg-[#FFF4EC] p-4 text-sm">
+                              L'envoi n'a pas abouti. Réessayez, ou envoyez votre demande sur WhatsApp :{' '}
+                              <a href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(texteWhatsApp)}`} target="_blank" rel="noreferrer" className="font-bold underline">ouvrir WhatsApp</a>.
+                            </p>
+                          )}
+                        </>
+                      )}
+
+                      <div className="flex flex-col-reverse gap-4 border-t border-[#EEF0F3] pt-6 sm:flex-row sm:items-center sm:justify-between">
+                        {etape > 1 ? (
+                          <button type="button" onClick={() => aller(etape - 1)} className="ac-lien text-[#0B1B3D]"><ArrowLeft size={16} /> Retour</button>
+                        ) : <span />}
+                        <button type="submit" disabled={etat === 'envoi'} className="ac-btn pm-brillance">
+                          {etape < 3 && <>Continuer <ArrowRight size={18} /></>}
+                          {etape === 3 && (etat === 'envoi' ? <><Loader2 size={18} className="animate-spin" /> Envoi en cours…</> : <><Send size={18} /> Envoyer ma demande</>)}
+                        </button>
+                      </div>
+                    </motion.form>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
           </div>
-        )}
 
+          {/* Récapitulatif */}
+          <aside className="lg:col-span-4">
+            <div className="space-y-5 lg:sticky lg:top-28">
+              <div className="ac-forge ac-chanfrein p-6">
+                <p className="ac-etiquette">Récapitulatif</p>
+                <dl className="mt-5 space-y-3 text-sm">
+                  {[
+                    ['Catégorie', cat?.nom],
+                    ['Produit', d.itemDetail || '—'],
+                    ['Quantité', d.quantity ? `${d.quantity} ${d.unit}` : '—'],
+                    ['Livraison', d.needDelivery ? d.deliveryLocation || 'Oui' : 'Retrait au dépôt'],
+                  ].map(([k, v]) => (
+                    <div key={k} className="flex justify-between gap-4 border-b border-white/10 pb-3">
+                      <dt className="ac-cond text-xs font-bold text-white/55">{k}</dt>
+                      <dd className="text-right font-semibold">
+                        <AnimatePresence mode="wait"><motion.span key={v} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="inline-block">{v}</motion.span></AnimatePresence>
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                {lignes.length > 0 && (
+                  <div className="mt-5">
+                    <p className="ac-cond text-xs font-bold text-[#FF6B00]">Ma sélection ({lignes.length})</p>
+                    <ul className="mt-2 space-y-2">
+                      {lignes.map((l) => (
+                        <li key={l.id} className="flex items-start justify-between gap-3 bg-white/[0.06] p-3 text-sm">
+                          <span><strong className="block">{l.produit}</strong><span className="text-white/65">{l.detail}</span></span>
+                          <button type="button" onClick={() => retirer(l.id)} aria-label={`Retirer ${l.produit}`} className="text-white/50 hover:text-[#FF6B00]"><Trash2 size={15} /></button>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-2 text-xs text-white/50">Cette sélection est jointe à votre demande.</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-white p-6">
+                <p className="font-['Barlow_Condensed'] text-2xl font-extrabold uppercase">Plus rapide ?</p>
+                <p className="mt-1 text-sm text-[#5F6878]">Appelez notre service commercial ou envoyez une photo de votre liste sur WhatsApp.</p>
+                <a href={`tel:${SITE.telephones[0].lien}`} className="mt-4 flex items-center gap-3 font-['Barlow_Condensed'] text-2xl font-extrabold tabular-nums hover:text-[#FF6B00]"><Phone size={20} className="text-[#FF6B00]" /> {SITE.telephones[0].affiche}</a>
+                <a href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(`Bonjour ${SITE.nom}, je souhaite un devis pour :`)}`} target="_blank" rel="noreferrer" className="ac-btn mt-4 w-full"><MessageCircle size={18} /> WhatsApp</a>
+              </div>
+
+              <div className="flex items-start gap-3 p-2 text-sm text-[#5F6878]">
+                <ShieldCheck size={20} className="mt-0.5 shrink-0 text-[#FF6B00]" />
+                Vos informations servent uniquement à établir votre devis.
+              </div>
+            </div>
+          </aside>
+        </div>
       </section>
-
     </div>
   );
 }

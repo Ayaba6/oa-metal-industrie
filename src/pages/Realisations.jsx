@@ -1,221 +1,78 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Building2, MapPin, CheckCircle, ArrowRight, Layers } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { MapPin, Calendar, User } from 'lucide-react';
+import '../acier/acier.css';
+import { EnTetePage, AppelAction, Chiffres } from '../acier/Pages';
+import { CONTENEUR, EASE, EnTeteSection } from '../acier/Communs';
+import { REALISATIONS, CATEGORIES_REALISATIONS } from '../data/pages';
 
-const categories = [
-  { id: 'all', label: 'Tous les projets' },
-  { id: 'batiment', label: 'Bâtiments & Immeubles' },
-  { id: 'industriel', label: 'Infrastructures & Usines' },
-  { id: 'residentiel', label: 'Résidentiel & Villas' }
-];
-
-const projectsList = [
-  {
-    id: 1,
-    title: "Complexe Commercial Ouaga 2000",
-    category: "batiment",
-    location: "Ouagadougou",
-    description: "Fourniture intégrale de fers à béton haute adhérence (HA) et de profilés métalliques pour la structure porteuse de ce centre commercial moderne.",
-    image: "https://images.unsplash.com/photo-1541888946425-d0fbb18f2445?auto=format&fit=crop&w=800&q=80",
-    client: "Groupe Immobilier du Faso",
-    year: "2025"
-  },
-  {
-    id: 2,
-    title: "Hangar Industriel & Stockage Logistique",
-    category: "industriel",
-    location: "Bobo-Dioulasso",
-    description: "Réalisation d'une charpente métallique de grande envergure avec des profilés IPE/HEB et tôles bacs alu robustes pour un site de stockage.",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
-    client: "Industrie & Logistique SA",
-    year: "2025"
-  },
-  {
-    id: 3,
-    title: "Cité Résidentielle Les Palmiers",
-    category: "residentiel",
-    location: "Ouagadougou",
-    description: "Approvisionnement régulier en fers de construction et treillis soudés pour la construction sécurisée de 30 villas haut standing.",
-    image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=800&q=80",
-    client: "Promotion Immobilière Privée",
-    year: "2024"
-  },
-  {
-    id: 4,
-    title: "Siège Social Institutionnel",
-    category: "batiment",
-    location: "Koudougou",
-    description: "Fourniture de matériaux de gros œuvre certifiés pour un bâtiment à R+4 respectant les normes parasismiques et de durabilité.",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
-    client: "Institution Publique",
-    year: "2025"
-  },
-  {
-    id: 5,
-    title: "Usine de Transformation Agro-alimentaire",
-    category: "industriel",
-    location: "Bobo-Dioulasso",
-    description: "Livraison express de tubes structuraux et de tôles ondulées galvanisées pour l'extension des lignes de production.",
-    image: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80",
-    client: "Agro-Industrie Burkina",
-    year: "2024"
-  },
-  {
-    id: 6,
-    title: "Immeuble d'Appartements Standing",
-    category: "residentiel",
-    location: "Ouagadougou",
-    description: "Livraison cadencée sur chantier exigu de fers à béton haute résistance du diamètre 8mm au 32mm.",
-    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
-    client: "Architectes & Associés",
-    year: "2026"
-  }
-];
+function CarteProjet({ p, i, grande }) {
+  return (
+    <motion.article
+      layout
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.6, delay: (i % 3) * 0.07, ease: EASE }}
+      className={`group relative overflow-hidden bg-[#0B1B3D] text-white ${grande ? 'lg:col-span-2 lg:row-span-2' : ''}`}
+    >
+      <div className={`relative ${grande ? 'aspect-[4/3] lg:aspect-auto lg:h-full lg:min-h-[34rem]' : 'aspect-[4/3]'}`}>
+        <img src={p.image} alt={p.titre} loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-80 transition-all duration-700 group-hover:scale-110 group-hover:opacity-50" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07122A] via-[#07122A]/40 to-transparent" />
+        <span className="ac-etiquette absolute left-4 top-4"><Calendar size={12} /> {p.annee}</span>
+        <div className="absolute inset-x-0 bottom-0 p-6">
+          <p className="ac-cond flex items-center gap-1.5 text-xs font-bold text-[#FF6B00]"><MapPin size={13} /> {p.lieu}</p>
+          <h3 className={`mt-2 font-['Barlow_Condensed'] font-extrabold uppercase leading-none ${grande ? 'text-4xl sm:text-5xl' : 'text-3xl'}`}>{p.titre}</h3>
+          <div className="grid grid-rows-[0fr] transition-all duration-500 group-hover:grid-rows-[1fr] group-focus-within:grid-rows-[1fr]">
+            <div className="overflow-hidden">
+              <p className="mt-3 text-sm leading-relaxed text-white/80">{p.texte}</p>
+              <p className="ac-cond mt-3 flex items-center gap-1.5 text-xs font-bold text-white/60"><User size={13} /> {p.client}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
 
 export default function Realisations() {
-  const [activeCategory, setActiveCategory] = useState('all');
-
-  const filteredProjects = activeCategory === 'all'
-    ? projectsList
-    : projectsList.filter(proj => proj.category === activeCategory);
+  const [cat, setCat] = useState('all');
+  const liste = cat === 'all' ? REALISATIONS : REALISATIONS.filter((p) => p.categorie === cat);
 
   return (
-    <div className="bg-white min-h-screen">
-      
-      {/* En-tête de la page */}
-      <section className="relative bg-industrial-blue text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <img 
-            src="https://images.unsplash.com/photo-1541888946425-d0fbb18f2445?auto=format&fit=crop&w=2000&q=80" 
-            alt="Réalisations OA Métal" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-industrial-blue via-industrial-blue/90 to-industrial-blue/60"></div>
-        </div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-          <motion.span 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-industrial-orange font-bold text-xs uppercase tracking-widest bg-industrial-orange/10 px-3 py-1 rounded-full inline-block"
-          >
-            Nos Références
-          </motion.span>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-5xl font-black uppercase tracking-tight"
-          >
-            Chantiers & Projets Réalisés
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto"
-          >
-            Découvrez une sélection de grands projets de construction et d'infrastructures bâtis grâce à la robustesse et la qualité des aciers OA Métal Industrie.
-          </motion.p>
-        </div>
-      </section>
+    <div className="ac bg-[#F3F4F6]">
+      <EnTetePage
+        fil="Réalisations"
+        etiquette="Nos références"
+        debut="Chantiers"
+        accent="& projets"
+        texte="Une sélection de projets de construction et d'infrastructures bâtis avec les aciers fournis par OA Métal Industrie."
+        image="/images/images.jpg"
+      />
 
-      {/* Section Filtres et Grille */}
-      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Boutons de filtre */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 cursor-pointer ${
-                activeCategory === cat.id
-                  ? 'bg-industrial-orange text-white shadow-md'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
+      <section className="py-20 lg:py-28">
+        <div className={CONTENEUR}>
+          <EnTeteSection etiquette="Ils nous ont fait confiance" debut="Des ouvrages" accent="qui tiennent" texte="Bâtiments, usines, villas : survolez un projet pour découvrir ce que nous avons fourni." />
 
-        {/* Grille des réalisations */}
-        <motion.div 
-          layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-          <AnimatePresence>
-            {filteredProjects.map((project) => (
-              <motion.div
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4 }}
-                key={project.id}
-                className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-industrial-orange/50 transition-all duration-300 flex flex-col group"
-              >
-                {/* Image du projet avec badge Année */}
-                <div className="relative h-56 overflow-hidden bg-gray-100">
-                  <img 
-                    src={project.image} 
-                    alt={project.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                  />
-                  <div className="absolute top-4 right-4 bg-industrial-orange text-white text-[10px] font-black uppercase px-3 py-1 rounded-full shadow">
-                    {project.year}
-                  </div>
-                  <div className="absolute bottom-4 left-4 bg-industrial-blue/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow">
-                    <MapPin size={14} className="text-industrial-orange" />
-                    <span>{project.location}</span>
-                  </div>
-                </div>
-
-                {/* Contenu de la carte */}
-                <div className="p-6 flex flex-col flex-grow justify-between space-y-4">
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-black text-industrial-blue uppercase group-hover:text-industrial-orange transition-colors">
-                      {project.title}
-                    </h3>
-                    <p className="text-gray-600 text-xs leading-relaxed">
-                      {project.description}
-                    </p>
-                  </div>
-
-                  {/* Informations client */}
-                  <div className="pt-4 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-gray-500">
-                    <span>Maître d'ouvrage :</span>
-                    <span className="text-industrial-blue font-bold">{project.client}</span>
-                  </div>
-
-                </div>
-              </motion.div>
+          <div className="mt-12 flex flex-wrap gap-2" role="group" aria-label="Filtrer les projets">
+            {CATEGORIES_REALISATIONS.map((c) => (
+              <button key={c.id} type="button" aria-pressed={cat === c.id} onClick={() => setCat(c.id)} className="ac-puce px-5 py-3 text-sm">{c.label}</button>
             ))}
-          </AnimatePresence>
-        </motion.div>
+          </div>
 
-      </section>
-
-      {/* Appel à l'action bas de page */}
-      <section className="bg-gray-50 py-16 border-t border-gray-100">
-        <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
-          <h2 className="text-2xl sm:text-3xl font-black text-industrial-blue uppercase">
-            Envie d'associer la qualité OA Métal à votre prochain projet ?
-          </h2>
-          <p className="text-gray-600 text-xs sm:text-sm">
-            Contactez notre bureau commercial pour discuter de vos besoins en approvisionnement de fers et de matériaux.
-          </p>
-          <a 
-            href="#contact" 
-            className="inline-flex bg-industrial-orange hover:bg-orange-600 text-white font-bold text-xs sm:text-sm px-8 py-4 rounded-xl uppercase tracking-wider transition shadow-lg"
-          >
-            Obtenir un devis personnalisé
-          </a>
+          <motion.div layout className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <AnimatePresence mode="popLayout">
+              {liste.map((p, i) => <CarteProjet key={p.titre} p={p} i={i} grande={cat === 'all' && i === 0} />)}
+            </AnimatePresence>
+          </motion.div>
         </div>
       </section>
 
+      <section className="pb-8">
+        <div className={CONTENEUR}><Chiffres /></div>
+      </section>
+
+      <AppelAction debut="Votre prochain projet" accent="avec OA Métal ?" texte="Contactez notre service commercial pour discuter de vos besoins en fers et en matériaux." />
     </div>
   );
 }

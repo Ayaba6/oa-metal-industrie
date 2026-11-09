@@ -1,0 +1,191 @@
+/* =====================================================================
+   Sections "acier" (sous le hero) — structure inspirée de synergiemetal.com,
+   aux couleurs d'OA Métal Industrie : bleu nuit + orange.
+   ===================================================================== */
+
+:root {
+  --ac-nuit: #0B1B3D;
+  --ac-nuit-2: #13264F;
+  --ac-nuit-3: #07122A;
+  --ac-orange: #FF6B00;
+  --ac-orange-2: #FF8A33;
+  --ac-toile: #F3F4F6;
+  --ac-acier-200: #D9DCE1;
+  --ac-acier-500: #5F6878;
+  --ac-acier-400: #8F96A3;
+  --ac-stries-claires: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.045) 0 8px, transparent 8px 16px);
+  --ac-stries-sombres: repeating-linear-gradient(-45deg, rgba(11, 27, 61, 0.035) 0 8px, transparent 8px 16px);
+  --ac-cisaille: 4vw;
+  --ac-chanfrein: 14px;
+  --ac-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ac {
+  font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--ac-nuit);
+}
+
+/* ---- Typographie ----------------------------------------------------- */
+.ac-titre {
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 0.92;
+  letter-spacing: -0.005em;
+  font-size: clamp(2.6rem, 5.4vw, 4.75rem);
+}
+.ac-titre-m {
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 0.95;
+  font-size: clamp(2.2rem, 4vw, 3.6rem);
+}
+.ac-cond {
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ac-accent { color: var(--ac-orange); }
+
+.ac-etiquette {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--ac-orange);
+  color: var(--ac-nuit);
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.65rem;
+}
+.ac-etiquette-contour {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid currentColor;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+}
+
+/* ---- Formes : chanfreins, cisailles, stries ------------------------- */
+.ac-chanfrein {
+  clip-path: polygon(0 0, calc(100% - var(--ac-chanfrein)) 0, 100% var(--ac-chanfrein), 100% 100%, var(--ac-chanfrein) 100%, 0 calc(100% - var(--ac-chanfrein)));
+}
+.ac-chanfrein-sm {
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+}
+.ac-cisaille-haut { clip-path: polygon(0 var(--ac-cisaille), 100% 0, 100% 100%, 0 100%); padding-top: calc(var(--ac-cisaille) + 5rem); }
+.ac-cisaille-bas { clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--ac-cisaille)), 0 100%); padding-bottom: calc(var(--ac-cisaille) + 5rem); }
+.ac-cisaille-deux {
+  clip-path: polygon(0 var(--ac-cisaille), 100% 0, 100% calc(100% - var(--ac-cisaille)), 0 100%);
+  padding-top: calc(var(--ac-cisaille) + 5rem);
+  padding-bottom: calc(var(--ac-cisaille) + 5rem);
+}
+.ac-stries { background-image: var(--ac-stries-claires); }
+.ac-stries-sombres { background-image: var(--ac-stries-sombres); }
+
+.ac-forge {
+  background-color: var(--ac-nuit);
+  background-image: var(--ac-stries-claires), radial-gradient(circle at 80% 20%, #1D3A78 0%, #0B1B3D 55%, #07122A 100%);
+  color: #fff;
+}
+
+/* ---- Boutons et liens ----------------------------------------------- */
+.ac-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.95rem 1.5rem;
+  white-space: nowrap;
+  background: var(--ac-orange);
+  color: var(--ac-nuit);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  transition: background-color 0.25s, transform 0.25s var(--ac-ease);
+  cursor: pointer;
+}
+.ac-btn:hover { background: var(--ac-orange-2); transform: translateY(-2px); }
+.ac-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.ac-btn-nuit { background: var(--ac-nuit); color: #fff; }
+.ac-btn-nuit:hover { background: var(--ac-nuit-2); }
+.ac-btn-contour { background: transparent; color: inherit; box-shadow: inset 0 0 0 1.5px currentColor; clip-path: none; }
+.ac-btn-contour:hover { background: rgba(11, 27, 61, 0.06); }
+
+.ac-lien {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding-bottom: 0.35rem;
+}
+.ac-lien::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 1.4rem;
+  background: var(--ac-orange);
+  transition: width 0.35s var(--ac-ease);
+}
+.ac-lien:hover::after { width: 100%; }
+
+/* ---- Puces et champs ------------------------------------------------- */
+.ac-puce {
+  border: 1px solid var(--ac-acier-200);
+  background: #fff;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+  cursor: pointer;
+}
+.ac-puce:hover { border-color: var(--ac-nuit); }
+.ac-puce[aria-pressed='true'] { background: var(--ac-orange); border-color: var(--ac-orange); color: var(--ac-nuit); }
+
+.ac-champ {
+  width: 100%;
+  border: 1px solid var(--ac-acier-200);
+  background: #fff;
+  padding: 0.85rem 0.95rem;
+  font-size: 0.95rem;
+  color: var(--ac-nuit);
+}
+.ac-champ::placeholder { color: var(--ac-acier-400); }
+.ac-champ:focus { outline: none; border-color: var(--ac-nuit); box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.22); }
+
+.ac fieldset { min-width: 0; }
+.ac :focus-visible { outline: 2px solid var(--ac-orange); outline-offset: 3px; }
+
+/* ---- Bandeau incliné -------------------------------------------------- */
+.ac-bandeau { transform: rotate(-2deg) scale(1.04); }
+
+/* ---- Halo pulsé du panneau de contrôle ------------------------------- */
+@keyframes ac-halo {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.55), 0 0 40px 6px rgba(255, 107, 0, 0.35); }
+  50% { box-shadow: 0 0 0 14px rgba(255, 107, 0, 0), 0 0 70px 14px rgba(255, 107, 0, 0.5); }
+}
+.ac-halo { animation: ac-halo 2.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ac-halo { animation: none; }
+  .ac-btn:hover { transform: none; }
+}
