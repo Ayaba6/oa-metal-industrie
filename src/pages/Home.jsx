@@ -3,7 +3,8 @@ import '../acier/acier.css';
 import { Hero } from '../premium/Sections';
 import { Intro } from '../premium/Dynamique';
 import ProduitsPhares from '../acier/ProduitsPhares';
-import { Engagements, Gamme, Controle, Chaine, GalerieHorizontale, Equipe, Questions, Devis } from '../acier/Sections';
+import { Engagements, Gamme, Controle, GalerieHorizontale, Equipe, Questions, Devis } from '../acier/Sections';
+import Trajet from '../acier/Trajet';
 import { Dock } from '../acier/Interface';
 import Bandeau from '../acier/BandeauV';
 
@@ -20,10 +21,10 @@ export default function Home() {
       <div className="ac bg-[#F3F4F6]">
         <Bandeau />
         <Engagements />
+        <Trajet />
         <ProduitsPhares />
         <Gamme />
         <Controle />
-        <Chaine />
         <GalerieHorizontale />
         <Equipe />
         <Questions />

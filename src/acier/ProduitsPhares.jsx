@@ -162,7 +162,7 @@ function Pilier({ num, etiquettes, debut, accent, texte, image, legende, childre
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 1.2, ease: EASE }}
         >
-          <div className="ac-chanfrein h-full min-h-[320px] overflow-hidden">
+          <div className="ac-chanfrein h-full min-h-[320px] overflow-hidden bg-[#D9DCE1]">
             <img src={image} alt={legende} className="h-full w-full object-cover transition-transform duration-[1.2s] hover:scale-105" loading="lazy" />
           </div>
           <figcaption className="ac-etiquette absolute bottom-4 left-4">{legende}</figcaption>

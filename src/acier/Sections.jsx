@@ -92,8 +92,12 @@ export function Gamme() {
                 className="group relative flex h-full flex-col overflow-hidden bg-white p-7 shadow-[0_1px_0_#D9DCE1]"
                 style={{ borderTop: `4px solid ${i < 3 ? '#FF6B00' : '#0B1B3D'}` }}
               >
-                {/* photo qui apparaît au survol */}
-                <span aria-hidden="true" className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                {/* Téléphones et tablettes (pas de survol possible) : la photo est toujours visible */}
+                <span className="relative -mx-7 -mt-7 mb-6 block aspect-[16/9] overflow-hidden [@media(hover:hover)]:hidden">
+                  <img src={p.image} alt={p.titre} loading="lazy" className="h-full w-full object-cover" />
+                </span>
+                {/* Ordinateur : la photo apparaît au survol */}
+                <span aria-hidden="true" className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 [@media(hover:none)]:hidden">
                   <img src={p.image} alt="" className="h-full w-full scale-110 object-cover transition-transform duration-700 group-hover:scale-100" />
                   <span className="absolute inset-0 bg-[#0B1B3D]/85" />
                 </span>
@@ -285,8 +289,8 @@ export function GalerieHorizontale() {
         <motion.ul style={{ x, paddingLeft: 'max(1.25rem, calc((100vw - 1240px) / 2 + 2rem))' }} className="mt-12 flex w-max gap-6">
           {PHOTOS.map((p, i) => (
             <li key={p.src} className="w-[78vw] shrink-0 sm:w-[30rem]">
-              <div className="ac-chanfrein aspect-[4/3] overflow-hidden">
-                <img src={p.src} alt={p.l} className="h-full w-full object-cover" loading="lazy" />
+              <div className="ac-chanfrein aspect-[4/3] overflow-hidden bg-[#13264F]">
+                <img src={p.src} alt={p.l} className="h-full w-full object-cover" loading="eager" decoding="async" />
               </div>
               <p className="mt-3 flex gap-3 text-sm text-white/75">
                 <span className="font-['Barlow_Condensed'] font-bold text-[#FF6B00]">{String(i + 1).padStart(2, '0')}</span>
